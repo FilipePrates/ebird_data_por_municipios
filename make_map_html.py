@@ -14,6 +14,7 @@ OUTPUT_HTML = "map_rj.html"
 
 RARITY_VERY_CUTOFF = 5
 RARITY_CUTOFF = 10
+RARITY_MINOR_CUTOFF = 20
 
 
 def normalize_name(name):
@@ -49,6 +50,8 @@ def rarity_label(count):
         return f"Muito rara (<= {RARITY_VERY_CUTOFF})"
     if count <= RARITY_CUTOFF:
         return f"Rara (<= {RARITY_CUTOFF})"
+    if count <= RARITY_MINOR_CUTOFF:
+        return f"Pouco rara (<= {RARITY_MINOR_CUTOFF})"
     return ""
 
 
@@ -124,6 +127,7 @@ def main():
       --accent-2: #ff8f5c;
       --rare: #ffe6a7;
       --very-rare: #ffc1c7;
+      --less-rare: #f8f1e6;
       --ring: rgba(29, 106, 90, 0.25);
     }}
     * {{ box-sizing: border-box; }}
@@ -229,6 +233,9 @@ def main():
     .species-item.very-rare {{
       background: var(--very-rare);
     }}
+    .species-item.less-rare {{
+      background: var(--less-rare);
+    }}
     .badge {{
       display: inline-block;
       font-size: 10px;
@@ -314,7 +321,7 @@ def main():
         <label for="species-search">Buscar especies</label>
         <input id="species-search" type="search" placeholder="Digite nome comum ou cientifico" />
       </div>
-      <div class="note">Cores de raridade: muito rara (<= {RARITY_VERY_CUTOFF}) e rara (<= {RARITY_CUTOFF}).</div>
+      <div class="note">Cores de raridade: muito rara (<= {RARITY_VERY_CUTOFF}), rara (<= {RARITY_CUTOFF}) e pouco rara (<= {RARITY_MINOR_CUTOFF}).</div>
       <div class="species" id="species-list"></div>
     </aside>
   </div>
@@ -327,6 +334,9 @@ def main():
   <script>
     const GEOJSON = {json.dumps(geojson, ensure_ascii=False)};
     const MUNICIPIOS = {json.dumps(municipio_data, ensure_ascii=False)};
+    const RARITY_VERY_CUTOFF = {RARITY_VERY_CUTOFF};
+    const RARITY_CUTOFF = {RARITY_CUTOFF};
+    const RARITY_MINOR_CUTOFF = {RARITY_MINOR_CUTOFF};
 
     function keyName(name) {{
       return name.normalize('NFD')
@@ -402,17 +412,23 @@ def main():
       filtered.forEach(item => {{
         const div = document.createElement('div');
         const classes = ['species-item'];
-        if (item.count <= {RARITY_VERY_CUTOFF}) classes.push('very-rare');
-        else if (item.count <= {RARITY_CUTOFF}) classes.push('rare');
+        if (item.count <= RARITY_VERY_CUTOFF) classes.push('very-rare');
+        else if (item.count <= RARITY_CUTOFF) classes.push('rare');
+        else if (item.count <= RARITY_MINOR_CUTOFF) classes.push('less-rare');
         if (activeSpecies === item.code) classes.push('active');
         div.className = classes.join(' ');
         div.dataset.code = item.code;
+        const rarityBadgeColor = item.count <= RARITY_VERY_CUTOFF
+          ? '#9f1239'
+          : item.count <= RARITY_CUTOFF
+            ? '#b45309'
+            : '#7c2d12';
         div.innerHTML = `
           <strong>${{item.common || item.scientific}}</strong>
           <div><em>${{item.scientific}}</em></div>
           <div>${{item.family}} · ${{item.order}}</div>
           <span class="badge">${{item.count}} municipios</span>
-          ${{item.rarity ? `<span class="badge" style="background:${{item.count <= {RARITY_VERY_CUTOFF} ? '#9f1239' : '#b45309'}};">${{item.rarity}}</span>` : ''}}
+          ${{item.rarity ? `<span class="badge" style="background:${{rarityBadgeColor}};">${{item.rarity}}</span>` : ''}}
         `;
         div.addEventListener('click', () => {{
           toggleSpeciesHighlight(item.code);

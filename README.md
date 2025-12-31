@@ -1,6 +1,6 @@
 # Analise de especies por municipio (RJ) - eBird
 
-Este projeto baixa dados do eBird para o estado do Rio de Janeiro e gera um relatorio em Excel com tabelas e graficos. 
+Este projeto baixa dados do eBird para o estado do Rio de Janeiro, gera um relatorio em Excel com tabelas e graficos, e cria um mapa HTML interativo por municipio.
 
 ## O que voce precisa
 
@@ -50,9 +50,24 @@ E_BIRD_API_KEY=SUA_CHAVE_AQUI
 python3 analyze_municipios.py
 ```
 
+### 5) Gerar o mapa HTML (recomendado)
+
+O mapa HTML mostra os municipios do RJ com riqueza de especies e uma lista filtravel. O arquivo `map_rj.html` pode ser enviado sozinho (ex: WhatsApp).
+
+```bash
+python3 make_map_html.py
+```
+
+Abra o arquivo no navegador:
+
+```
+map_rj.html
+```
+
 ## Onde ficam os resultados
 
 - Excel gerado: `outputs/`
+- Mapa interativo: `map_rj.html`
 - Cache dos dados (para nao baixar tudo de novo): `data/`
 
 ## Como funciona o cache

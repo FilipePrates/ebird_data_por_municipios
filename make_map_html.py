@@ -24,7 +24,7 @@ RARITY_MINOR_CUTOFF = 20
 
 CLUSTER_LEVELS = ["species", "family", "order"]
 CLUSTER_MIN = 2
-CLUSTER_MAX = 8
+CLUSTER_MAX = 10
 CLUSTER_DEFAULT = 5
 CLUSTER_COLORS = [
     "#1b5e20",
@@ -268,20 +268,20 @@ def main():
       min-height: 0;
     }}
     .species-item {{
-      padding: 8px 10px;
-      margin-bottom: 6px;
+      padding: 7px 8px;
+      margin-bottom: 5px;
       border-radius: 10px;
       border: 1px solid #ece7df;
       background: #fff;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
       line-height: 1.2;
     }}
     .species-item strong {{
-      font-size: 13px;
+      font-size: 12px;
     }}
     .species-item em {{
-      font-size: 12px;
+      font-size: 11px;
     }}
     .species-item.active {{
       border-color: #2a5f57;
@@ -307,8 +307,14 @@ def main():
     }}
     .note {{
       margin-top: 8px;
-      font-size: 11px;
+      font-size: 10px;
       color: #666;
+    }}
+    .species-collapsed #sidebar .species,
+    .species-collapsed #sidebar .note,
+    .species-collapsed #sidebar .search,
+    .species-collapsed #cluster-legend-items {{
+      display: none;
     }}
     .cluster-bar {{
       padding: 8px 8px 6px;
@@ -328,7 +334,25 @@ def main():
       left: 16px;
       z-index: 500;
       width: min(240px, 72vw);
+      max-height: 70vh;
       pointer-events: auto;
+    }}
+    .cluster-legend-toggle {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.05);
+    }}
+    .cluster-legend-toggle span {{
+      font-size: 11px;
+      color: #666;
+      font-weight: 500;
     }}
     .cluster-legend-heading {{
       font-weight: 600;
@@ -364,6 +388,16 @@ def main():
       display: flex;
       flex-direction: column;
       gap: 6px;
+      overflow-y: auto;
+      padding-right: 4px;
+      min-height: 0;
+      flex: 1 1 auto;
+    }}
+    .cluster-controls {{
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 0 0 auto;
     }}
     .cluster-selector {{
       display: flex;
@@ -396,7 +430,7 @@ def main():
     @media (max-width: 900px) {{
       #app {{
         grid-template-columns: 1fr;
-        grid-template-rows: 30vh 70vh;
+        grid-template-rows: 50vh auto;
       }}
       #sidebar {{
         border-left: none;
@@ -418,15 +452,15 @@ def main():
         margin-top: 4px;
       }}
       .species-item {{
-        padding: 5px 7px;
+        padding: 4px 6px;
         margin-bottom: 4px;
-        font-size: 12px;
+        font-size: 11px;
       }}
       .species-item strong {{
-        font-size: 12px;
+        font-size: 11px;
       }}
       .species-item em {{
-        font-size: 11px;
+        font-size: 10px;
       }}
       .badge {{
         font-size: 9px;
@@ -437,6 +471,19 @@ def main():
         padding-bottom: 16px;
       }}
     }}
+    @media (max-width: 900px) {{
+      .cluster-bar.map-legend {{
+        position: fixed;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: auto;
+        width: min(320px, 92vw);
+        max-height: 48vh;
+        z-index: 2000;
+        overflow: hidden;
+      }}
+    }}
   </style>
 </head>
 <body>
@@ -444,27 +491,32 @@ def main():
     <div id="map-wrap">
       <div id="map"></div>
       <div class="cluster-bar map-legend" id="cluster-legend">
-        <div class="cluster-legend-heading">Agrupamentos (k-means)</div>
-        <div class="cluster-legend-items" id="cluster-legend-items"></div>
-        <div class="cluster-selector">
-          <label for="cluster-level">Nivel</label>
-          <select id="cluster-level">
-            <option value="species" selected>Especie</option>
-            <option value="family">Familia</option>
-            <option value="order">Ordem</option>
-          </select>
+        <div class="cluster-legend-toggle" id="cluster-legend-toggle">
+          Agrupamentos (k-means)
+          <span id="cluster-legend-toggle-label">Ocultar</span>
         </div>
-        <div class="cluster-selector">
-          <label for="cluster-count">
-            Clusters: <span id="cluster-count-label">{CLUSTER_DEFAULT}</span>
-          </label>
-          <input
-            id="cluster-count"
-            type="range"
-            min="{CLUSTER_MIN}"
-            max="{CLUSTER_MAX}"
-            value="{CLUSTER_DEFAULT}"
-          />
+        <div class="cluster-legend-items" id="cluster-legend-items"></div>
+        <div class="cluster-controls">
+          <div class="cluster-selector">
+            <label for="cluster-level">Nivel</label>
+            <select id="cluster-level">
+              <option value="species" selected>Especie</option>
+              <option value="family">Familia</option>
+              <option value="order">Ordem</option>
+            </select>
+          </div>
+          <div class="cluster-selector">
+            <label for="cluster-count">
+              Clusters: <span id="cluster-count-label">{CLUSTER_DEFAULT}</span>
+            </label>
+            <input
+              id="cluster-count"
+              type="range"
+              min="{CLUSTER_MIN}"
+              max="{CLUSTER_MAX}"
+              value="{CLUSTER_DEFAULT}"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -561,7 +613,12 @@ def main():
       return CLUSTER_COLORS[label % CLUSTER_COLORS.length];
     }}
 
+    function isDataDeficient(data) {{
+      return getClusterLabel(data) == null;
+    }}
+
     function getMunicipioStrokeColor(data) {{
+      if (isDataDeficient(data)) return '#9ca3af';
       return getClusterColor(data) || '#4c4c4c';
     }}
 
@@ -585,10 +642,12 @@ def main():
     }}
 
     function getMunicipioFillColor(data) {{
+      if (isDataDeficient(data)) return '#e5e7eb';
       return getClusterColor(data) || getColor(data ? data.richness : null, thresholds);
     }}
 
     function getMunicipioFillOpacity(data) {{
+      if (isDataDeficient(data)) return 0.65;
       if (getClusterColor(data)) return getRichnessOpacity(data.richness);
       return 0.75;
     }}
@@ -740,8 +799,8 @@ def main():
       const countEl = document.getElementById('info-count');
       if (titleEl) titleEl.textContent = data.name;
       if (richnessEl) richnessEl.textContent = data.richness;
-      if (clusterEl) clusterEl.textContent = selectedCluster != null ? `Cluster ${{selectedCluster}}` : '—';
-      if (signatureEl) signatureEl.textContent = clusterSignature;
+      if (clusterEl) clusterEl.textContent = selectedCluster != null ? `Cluster ${{selectedCluster}}` : 'Sem dados';
+      if (signatureEl) signatureEl.textContent = selectedCluster != null ? clusterSignature : 'amostragem baixa';
       if (countEl) countEl.textContent = filtered.length;
       list.innerHTML = '';
       filtered.forEach(item => {{
@@ -868,6 +927,8 @@ def main():
 
     const clusterInput = document.getElementById('cluster-count');
     const clusterLevel = document.getElementById('cluster-level');
+    const clusterToggle = document.getElementById('cluster-legend-toggle');
+    const clusterToggleLabel = document.getElementById('cluster-legend-toggle-label');
     if (clusterInput) {{
       if (!Object.keys(CLUSTER_HISTORY).length) {{
         clusterInput.setAttribute('disabled', 'disabled');
@@ -881,6 +942,16 @@ def main():
       clusterLevel.addEventListener('change', (event) => {{
         if (!event.target) return;
         setClusterLevel(event.target.value);
+      }});
+    }}
+    if (clusterToggle) {{
+      clusterToggle.addEventListener('click', () => {{
+        document.body.classList.toggle('species-collapsed');
+        if (clusterToggleLabel) {{
+          clusterToggleLabel.textContent = document.body.classList.contains('species-collapsed')
+            ? 'Mostrar'
+            : 'Ocultar';
+        }}
       }});
     }}
     setClusterCount(CLUSTER_DEFAULT);

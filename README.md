@@ -68,9 +68,9 @@ Abra o arquivo no navegador:
 map_rj.html
 ```
 
-O mapa agora colore cada municipio segundo o cluster das especies que aparecem ali; a legenda lateral mostra a assinatura das especies que definem cada grupo para facilitar a interpretacao.
+O mapa agora colore cada municipio segundo o cluster das especies que aparecem ali; a legenda mostra a assinatura das especies que definem cada grupo para facilitar a interpretacao.
 
-O painel de clusters também permite escolher quantos grupos você deseja visualizar (2 a 8); o controle ajusta o traço dos polígonos sem perder o preenchimento de riqueza, então dá pra ver como o “feeling” muda com diferentes granularidades.
+O painel de clusters também permite escolher quantos grupos você deseja visualizar (2 a 8); o controle ajusta o traço dos polígonos sem perder o preenchimento de riqueza, então dá pra ver como o “feeling” muda com diferentes granularidades. O botao "Ocultar" esconde a lista de especies e a legenda de raridade, mas mantem os controles de clusters visiveis.
 
 > **Preview do mapa**: baixe `map_rj.html` (ele já está gerado na raiz) e abra o arquivo no Chrome/Firefox/Edge para ver o mapa completo. Como o Leaflet depende de scripts externos, visualizá-lo diretamente evita erros como `ReferenceError: L is not defined`.
 
@@ -107,10 +107,12 @@ E_BIRD_LOCALE=pt_BR python3 analyze_municipios.py
 
 ## Agrupar municipios pelo “feeling” do bioma
 
-Se quiser separar os municipios por tipos de especies em vez de por riqueza, use `cluster_municipios.py`. O script soma quantas especies de cada ordem (ou familia, passe `--level family`) aparecem em cada municipio, normaliza para evitar que municipios com muitos registros dominem o resultado e aplica um k‑means com distancia de cosseno para aproximar ecoregions naturais. A flag `--level species` roda o mesmo pipeline usando cada especie como categoria, oferecendo a resolucao mais fina (pode gerar clusters diferentes porque representa o “feeling” diretamente). Rode:
+Se quiser separar os municipios por tipos de especies em vez de por riqueza, use `cluster_municipios.py`. O script usa representacao TF‑IDF das especies (ou ordens/familias), aplica uma suavizacao que puxa municipios com pouca amostragem para o perfil medio do estado e roda k‑means com distancia de cosseno para aproximar ecoregions naturais. A flag `--level species` roda o mesmo pipeline usando cada especie como categoria, oferecendo a resolucao mais fina (representa o “feeling” diretamente). Rode:
 
 ```bash
 python3 cluster_municipios.py
 ```
 
 O CSV gerado (`outputs/municipio_clusters.csv`) lista o cluster de cada municipio e a assinatura taxa-top do grupo, e o resumo JSON (`outputs/municipio_clusters_summary.json`) descreve quais municipios e ordens definem cada cluster. Ajuste `--clusters` se quiser mais ou menos grupos e compare com o mapa para validar visualmente.
+
+Municipios com pouquissimas especies nao entram no k‑means (para nao distorcer o resultado). Ajuste o minimo com `--min-species` e a forca da suavizacao com `--shrink` se quiser ser mais ou menos conservador.

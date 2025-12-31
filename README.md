@@ -27,9 +27,12 @@ Se der erro de "venv", instale o pacote:
 sudo apt install python3-venv
 ```
 
-### 2) Instalar a dependencia do Excel
+### 2) Ativar o venv e instalar a dependencia do Excel
+
+Ative o venv antes de instalar:
 
 ```bash
+. .venv/bin/activate
 pip install openpyxl
 ```
 
@@ -76,4 +79,3 @@ E_BIRD_LOCALE=pt_BR python3 analyze_municipios.py
 
 - **Nao gera Excel**: instale o `openpyxl` dentro do venv.
 - **Demora muito**: na primeira vez ele baixa tudo e salva em cache. Nas proximas, fica rapido.
-

@@ -1,0 +1,370 @@
+[
+  {
+    "code": "BR-RJ-001",
+    "name": "Angra dos Reis"
+  },
+  {
+    "code": "BR-RJ-002",
+    "name": "Aperibé"
+  },
+  {
+    "code": "BR-RJ-003",
+    "name": "Araruama"
+  },
+  {
+    "code": "BR-RJ-004",
+    "name": "Areal"
+  },
+  {
+    "code": "BR-RJ-005",
+    "name": "Armação dos Búzios"
+  },
+  {
+    "code": "BR-RJ-006",
+    "name": "Arraial do Cabo"
+  },
+  {
+    "code": "BR-RJ-008",
+    "name": "Barra Mansa"
+  },
+  {
+    "code": "BR-RJ-007",
+    "name": "Barra do Piraí"
+  },
+  {
+    "code": "BR-RJ-009",
+    "name": "Belford Roxo"
+  },
+  {
+    "code": "BR-RJ-010",
+    "name": "Bom Jardim"
+  },
+  {
+    "code": "BR-RJ-011",
+    "name": "Bom Jesus do Itabapoana"
+  },
+  {
+    "code": "BR-RJ-012",
+    "name": "Cabo Frio"
+  },
+  {
+    "code": "BR-RJ-013",
+    "name": "Cachoeiras de Macacu"
+  },
+  {
+    "code": "BR-RJ-014",
+    "name": "Cambuci"
+  },
+  {
+    "code": "BR-RJ-015",
+    "name": "Campos dos Goytacazes"
+  },
+  {
+    "code": "BR-RJ-016",
+    "name": "Cantagalo"
+  },
+  {
+    "code": "BR-RJ-017",
+    "name": "Carapebus"
+  },
+  {
+    "code": "BR-RJ-018",
+    "name": "Cardoso Moreira"
+  },
+  {
+    "code": "BR-RJ-019",
+    "name": "Carmo"
+  },
+  {
+    "code": "BR-RJ-020",
+    "name": "Casimiro de Abreu"
+  },
+  {
+    "code": "BR-RJ-021",
+    "name": "Comendador Levy Gasparian"
+  },
+  {
+    "code": "BR-RJ-022",
+    "name": "Conceição de Macabu"
+  },
+  {
+    "code": "BR-RJ-023",
+    "name": "Cordeiro"
+  },
+  {
+    "code": "BR-RJ-024",
+    "name": "Duas Barras"
+  },
+  {
+    "code": "BR-RJ-025",
+    "name": "Duque de Caxias"
+  },
+  {
+    "code": "BR-RJ-026",
+    "name": "Engenheiro Paulo de Frontin"
+  },
+  {
+    "code": "BR-RJ-027",
+    "name": "Guapimirim"
+  },
+  {
+    "code": "BR-RJ-028",
+    "name": "Iguaba Grande"
+  },
+  {
+    "code": "BR-RJ-029",
+    "name": "Itaboraí"
+  },
+  {
+    "code": "BR-RJ-030",
+    "name": "Itaguaí"
+  },
+  {
+    "code": "BR-RJ-031",
+    "name": "Italva"
+  },
+  {
+    "code": "BR-RJ-032",
+    "name": "Itaocara"
+  },
+  {
+    "code": "BR-RJ-033",
+    "name": "Itaperuna"
+  },
+  {
+    "code": "BR-RJ-034",
+    "name": "Itatiaia"
+  },
+  {
+    "code": "BR-RJ-035",
+    "name": "Japeri"
+  },
+  {
+    "code": "BR-RJ-036",
+    "name": "Laje do Muriaé"
+  },
+  {
+    "code": "BR-RJ-037",
+    "name": "Macaé"
+  },
+  {
+    "code": "BR-RJ-038",
+    "name": "Macuco"
+  },
+  {
+    "code": "BR-RJ-039",
+    "name": "Magé"
+  },
+  {
+    "code": "BR-RJ-040",
+    "name": "Mangaratiba"
+  },
+  {
+    "code": "BR-RJ-041",
+    "name": "Maricá"
+  },
+  {
+    "code": "BR-RJ-042",
+    "name": "Mendes"
+  },
+  {
+    "code": "BR-RJ-043",
+    "name": "Mesquita"
+  },
+  {
+    "code": "BR-RJ-044",
+    "name": "Miguel Pereira"
+  },
+  {
+    "code": "BR-RJ-045",
+    "name": "Miracema"
+  },
+  {
+    "code": "BR-RJ-046",
+    "name": "Natividade"
+  },
+  {
+    "code": "BR-RJ-047",
+    "name": "Nilópolis"
+  },
+  {
+    "code": "BR-RJ-048",
+    "name": "Niterói"
+  },
+  {
+    "code": "BR-RJ-049",
+    "name": "Nova Friburgo"
+  },
+  {
+    "code": "BR-RJ-050",
+    "name": "Nova Iguaçu"
+  },
+  {
+    "code": "BR-RJ-051",
+    "name": "Paracambi"
+  },
+  {
+    "code": "BR-RJ-053",
+    "name": "Paraty"
+  },
+  {
+    "code": "BR-RJ-052",
+    "name": "Paraíba do Sul"
+  },
+  {
+    "code": "BR-RJ-054",
+    "name": "Paty do Alferes"
+  },
+  {
+    "code": "BR-RJ-055",
+    "name": "Petrópolis"
+  },
+  {
+    "code": "BR-RJ-056",
+    "name": "Pinheiral"
+  },
+  {
+    "code": "BR-RJ-057",
+    "name": "Piraí"
+  },
+  {
+    "code": "BR-RJ-058",
+    "name": "Porciúncula"
+  },
+  {
+    "code": "BR-RJ-059",
+    "name": "Porto Real"
+  },
+  {
+    "code": "BR-RJ-060",
+    "name": "Quatis"
+  },
+  {
+    "code": "BR-RJ-061",
+    "name": "Queimados"
+  },
+  {
+    "code": "BR-RJ-062",
+    "name": "Quissamã"
+  },
+  {
+    "code": "BR-RJ-063",
+    "name": "Resende"
+  },
+  {
+    "code": "BR-RJ-064",
+    "name": "Rio Bonito"
+  },
+  {
+    "code": "BR-RJ-065",
+    "name": "Rio Claro"
+  },
+  {
+    "code": "BR-RJ-066",
+    "name": "Rio das Flores"
+  },
+  {
+    "code": "BR-RJ-067",
+    "name": "Rio das Ostras"
+  },
+  {
+    "code": "BR-RJ-068",
+    "name": "Rio de Janeiro"
+  },
+  {
+    "code": "BR-RJ-069",
+    "name": "Santa Maria Madalena"
+  },
+  {
+    "code": "BR-RJ-070",
+    "name": "Santo Antônio de Pádua"
+  },
+  {
+    "code": "BR-RJ-080",
+    "name": "Sapucaia"
+  },
+  {
+    "code": "BR-RJ-081",
+    "name": "Saquarema"
+  },
+  {
+    "code": "BR-RJ-082",
+    "name": "Seropédica"
+  },
+  {
+    "code": "BR-RJ-083",
+    "name": "Silva Jardim"
+  },
+  {
+    "code": "BR-RJ-084",
+    "name": "Sumidouro"
+  },
+  {
+    "code": "BR-RJ-071",
+    "name": "São Fidélis"
+  },
+  {
+    "code": "BR-RJ-072",
+    "name": "São Francisco de Itabapoana"
+  },
+  {
+    "code": "BR-RJ-073",
+    "name": "São Gonçalo"
+  },
+  {
+    "code": "BR-RJ-076",
+    "name": "São José de Ubá"
+  },
+  {
+    "code": "BR-RJ-077",
+    "name": "São José do Vale do Rio Preto"
+  },
+  {
+    "code": "BR-RJ-074",
+    "name": "São João da Barra"
+  },
+  {
+    "code": "BR-RJ-075",
+    "name": "São João de Meriti"
+  },
+  {
+    "code": "BR-RJ-078",
+    "name": "São Pedro da Aldeia"
+  },
+  {
+    "code": "BR-RJ-079",
+    "name": "São Sebastião do Alto"
+  },
+  {
+    "code": "BR-RJ-085",
+    "name": "Tanguá"
+  },
+  {
+    "code": "BR-RJ-086",
+    "name": "Teresópolis"
+  },
+  {
+    "code": "BR-RJ-087",
+    "name": "Trajano de Moraes"
+  },
+  {
+    "code": "BR-RJ-088",
+    "name": "Três Rios"
+  },
+  {
+    "code": "BR-RJ-089",
+    "name": "Valença"
+  },
+  {
+    "code": "BR-RJ-090",
+    "name": "Varre-Sai"
+  },
+  {
+    "code": "BR-RJ-091",
+    "name": "Vassouras"
+  },
+  {
+    "code": "BR-RJ-092",
+    "name": "Volta Redonda"
+  }
+]

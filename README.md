@@ -1,0 +1,79 @@
+# Analise de especies por municipio (RJ) - eBird
+
+Este projeto baixa dados do eBird para o estado do Rio de Janeiro e gera um relatorio em Excel com tabelas e graficos. O foco e ser simples para quem nao e da area de computacao.
+
+## O que voce precisa
+
+- Ubuntu
+- Python 3 instalado
+- Chave do eBird (E_BIRD_API_KEY)
+
+## Passo a passo (Ubuntu)
+
+### 1) Criar e usar um ambiente virtual (venv)
+
+O "venv" cria um espaco separado so para este projeto, evitando problemas no sistema.
+
+No terminal, dentro da pasta do projeto:
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+```
+
+Se der erro de "venv", instale o pacote:
+
+```bash
+sudo apt install python3-venv
+```
+
+### 2) Instalar a dependencia do Excel
+
+```bash
+pip install openpyxl
+```
+
+### 3) Configurar a chave do eBird
+
+Crie/edite o arquivo `.env` com sua chave:
+
+```
+E_BIRD_API_KEY=SUA_CHAVE_AQUI
+```
+
+### 4) Rodar o script
+
+```bash
+python3 analyze_municipios.py
+```
+
+## Onde ficam os resultados
+
+- Excel gerado: `outputs/`
+- Cache dos dados (para nao baixar tudo de novo): `data/`
+
+## Como funciona o cache
+
+O script salva os dados baixados em `data/`. Assim, as proximas execucoes sao bem mais rapidas.
+
+Se quiser baixar tudo novamente:
+
+```bash
+E_BIRD_REFRESH=1 python3 analyze_municipios.py
+```
+
+## Idioma dos nomes das especies
+
+Por padrao, o script usa nomes comuns em portugues (pt_BR).
+
+Se quiser outro idioma:
+
+```bash
+E_BIRD_LOCALE=pt_BR python3 analyze_municipios.py
+```
+
+## Problemas comuns
+
+- **Nao gera Excel**: instale o `openpyxl` dentro do venv.
+- **Demora muito**: na primeira vez ele baixa tudo e salva em cache. Nas proximas, fica rapido.
+

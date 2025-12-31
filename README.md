@@ -2,9 +2,9 @@
 
 Este projeto baixa dados do eBird para o estado do Rio de Janeiro, gera um relatorio em Excel com tabelas e graficos, e cria um mapa HTML interativo por municipio.
 
-## Visualize o mapa direto no GitHub
+## Visualize o mapa localmente
 
-O `map_rj.html` fica logo no topo do repositório e pode ser aberto com a preview HTML do GitHub para interagir pelo navegador; também dá pra usar https://htmlpreview.github.io/?https://github.com/FilipePrates/ebird_data_por_municipios/master/map_rj.html. Manter esse HTML na raiz garante que qualquer visitante clique e explore os filtros do mapa sem precisar rodar os scripts localmente.
+Faça o download do `map_rj.html` (ele fica na raiz do repositório) e abra o arquivo no Chrome/Firefox/Edge para explorar as camadas e filtros no seu navegador padrão.
 
 ## O que voce precisa
 
@@ -68,7 +68,7 @@ Abra o arquivo no navegador:
 map_rj.html
 ```
 
-> **Preview do mapa**: o GitHub tenta abrir o `map_rj.html` na própria UI e o `htmlpreview` pode mostrar o arquivo, mas a interação depende do Leaflet carregar via CDN. Quando o `htmlpreview` acusa `ReferenceError: L is not defined` (o Leaflet não carrega por causa de scripts externos sendo bloqueados), abra `map_rj.html` diretamente ou exponha o arquivo com `python -m http.server 8000`/GitHub Pages para obter o mapa com camadas e filtros funcionando.
+> **Preview do mapa**: baixe `map_rj.html` (ele já está gerado na raiz) e abra o arquivo no Chrome/Firefox/Edge para ver o mapa completo. Como o Leaflet depende de scripts externos, visualizá-lo diretamente evita erros como `ReferenceError: L is not defined`.
 
 ## Onde ficam os resultados
 

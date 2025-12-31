@@ -68,7 +68,7 @@ Abra o arquivo no navegador:
 map_rj.html
 ```
 
-> **Preview do mapa**: ao clicar no `map_rj.html` na arvore do repositório o GitHub abre o `map.html` (a mesma versão interativa) e permite explora-lo no proprio browser; voce tambem pode usar `https://htmlpreview.github.io/?https://github.com/FilipePrates/ebird_data_por_municipios/master/map_rj.html` para carregar o mapa em outra aba.
+> **Preview do mapa**: o GitHub tenta abrir o `map_rj.html` na própria UI e o `htmlpreview` pode mostrar o arquivo, mas a interação depende do Leaflet carregar via CDN. Quando o `htmlpreview` acusa `ReferenceError: L is not defined` (o Leaflet não carrega por causa de scripts externos sendo bloqueados), abra `map_rj.html` diretamente ou exponha o arquivo com `python -m http.server 8000`/GitHub Pages para obter o mapa com camadas e filtros funcionando.
 
 ## Onde ficam os resultados
 

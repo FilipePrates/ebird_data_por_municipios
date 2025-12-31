@@ -1,6 +1,6 @@
 # Analise de especies por municipio (RJ) - eBird
 
-Este projeto baixa dados do eBird para o estado do Rio de Janeiro e gera um relatorio em Excel com tabelas e graficos. O foco e ser simples para quem nao e da area de computacao.
+Este projeto baixa dados do eBird para o estado do Rio de Janeiro e gera um relatorio em Excel com tabelas e graficos. 
 
 ## O que voce precisa
 

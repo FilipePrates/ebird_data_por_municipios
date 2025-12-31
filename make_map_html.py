@@ -3,6 +3,12 @@ import json
 import os
 import sys
 import unicodedata
+from collections import defaultdict
+
+try:
+    from cluster_municipios import assign_clusters
+except ImportError:  # pragma: no cover
+    assign_clusters = None
 
 
 REGION = "BR-RJ"
@@ -15,6 +21,22 @@ OUTPUT_HTML = "map_rj.html"
 RARITY_VERY_CUTOFF = 5
 RARITY_CUTOFF = 10
 RARITY_MINOR_CUTOFF = 20
+
+CLUSTER_LEVELS = ["species", "family", "order"]
+CLUSTER_MIN = 2
+CLUSTER_MAX = 8
+CLUSTER_DEFAULT = 5
+CLUSTER_COLORS = [
+    "#1b5e20",
+    "#ff8f00",
+    "#006064",
+    "#8e24aa",
+    "#c62828",
+    "#2e7d32",
+    "#6d4c41",
+    "#1565c0",
+    "#ad1457",
+]
 
 
 def normalize_name(name):
@@ -71,6 +93,17 @@ def main():
     taxonomy = load_json(TAXONOMY_PATH)
     taxonomy_map = build_taxonomy_map(taxonomy)
 
+    cluster_history = {level: {} for level in CLUSTER_LEVELS}
+    cluster_labels = {level: defaultdict(dict) for level in CLUSTER_LEVELS}
+    if assign_clusters:
+        for level in CLUSTER_LEVELS:
+            for count in range(CLUSTER_MIN, CLUSTER_MAX + 1):
+                labels, _, _, summary, _ = assign_clusters(combined, taxonomy_map, level, count)
+                cluster_history[level][count] = summary or {}
+                for item, label in zip(combined, labels):
+                    key = normalize_name(item.get("name"))
+                    cluster_labels[level][key][count] = label
+
     species_counts = {}
     for item in combined:
         for code in item.get("species", []):
@@ -98,11 +131,15 @@ def main():
             )
         species_list.sort(key=lambda s: (s["count"], s["common"]))
         key = normalize_name(name)
+        clusters = {level: cluster_labels[level].get(key, {}) for level in CLUSTER_LEVELS}
+        default_cluster = clusters.get("species", {}).get(CLUSTER_DEFAULT)
         municipio_data[key] = {
             "name": name,
             "code": code,
             "richness": len(species_codes),
             "species": species_list,
+            "clusters": clusters,
+            "cluster": default_cluster,
         }
 
     html = f"""<!doctype html>
@@ -155,14 +192,10 @@ def main():
       gap: 10px;
       box-shadow: -12px 0 30px rgba(0, 0, 0, 0.04);
     }}
-    h1 {{
-      margin: 0 0 6px;
-      font-size: 19px;
-      letter-spacing: 0.3px;
-    }}
-    .meta {{
-      font-size: 12px;
-      color: #555;
+    #map-wrap {{
+      position: relative;
+      height: 100%;
+      width: 100%;
     }}
     #map {{
       height: 100%;
@@ -170,10 +203,37 @@ def main():
     }}
     .stat {{
       margin-top: 8px;
-      padding: 8px 10px;
+      padding: 6px 8px;
       border: 1px solid #e2ded8;
       border-radius: 12px;
       background: var(--panel);
+    }}
+    .info-title {{
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }}
+    .info-subtitle {{
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 8px;
+    }}
+    .info-row {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }}
+    .info-row:last-child {{
+      margin-bottom: 0;
+    }}
+    .info-label {{
+      color: #777;
+    }}
+    .info-value {{
+      font-weight: 500;
     }}
     .stat strong {{
       display: block;
@@ -250,6 +310,84 @@ def main():
       font-size: 11px;
       color: #666;
     }}
+    .cluster-bar {{
+      padding: 8px 8px 6px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: #555;
+      backdrop-filter: blur(6px);
+    }}
+    .cluster-bar.map-legend {{
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      z-index: 500;
+      width: min(240px, 72vw);
+      pointer-events: auto;
+    }}
+    .cluster-legend-heading {{
+      font-weight: 600;
+      font-size: 13px;
+    }}
+    .cluster-legend-item {{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 10px;
+      transition: background 0.2s ease;
+    }}
+    .cluster-legend-item:hover {{
+      background: rgba(0, 0, 0, 0.06);
+    }}
+    .cluster-legend-item.active {{
+      background: rgba(0, 0, 0, 0.12);
+    }}
+    .cluster-legend-color {{
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      display: inline-block;
+    }}
+    .cluster-legend-meta {{
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }}
+    .cluster-legend-items {{
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }}
+    .cluster-selector {{
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }}
+    .cluster-selector label {{
+      font-size: 11px;
+      color: #555;
+      font-weight: 500;
+    }}
+    .cluster-selector input {{
+      width: 100%;
+      accent-color: var(--accent);
+    }}
+    .cluster-selector select {{
+      width: 100%;
+      padding: 4px 6px;
+      border-radius: 8px;
+      border: 1px solid #ddd6cc;
+      background: #fff;
+      font-size: 12px;
+      font-family: inherit;
+    }}
     @media (max-width: 1200px) {{
       #app {{
         grid-template-columns: 1fr clamp(300px, 38vw, 380px);
@@ -264,12 +402,6 @@ def main():
         border-left: none;
         border-top: 1px solid #e2ded8;
         box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.06);
-      }}
-      #sidebar h1 {{
-        font-size: 16px;
-      }}
-      .meta {{
-        font-size: 10px;
       }}
       .stat {{
         margin-top: 4px;
@@ -309,13 +441,53 @@ def main():
 </head>
 <body>
   <div id="app">
-    <div id="map"></div>
+    <div id="map-wrap">
+      <div id="map"></div>
+      <div class="cluster-bar map-legend" id="cluster-legend">
+        <div class="cluster-legend-heading">Agrupamentos (k-means)</div>
+        <div class="cluster-legend-items" id="cluster-legend-items"></div>
+        <div class="cluster-selector">
+          <label for="cluster-level">Nivel</label>
+          <select id="cluster-level">
+            <option value="species" selected>Especie</option>
+            <option value="family">Familia</option>
+            <option value="order">Ordem</option>
+          </select>
+        </div>
+        <div class="cluster-selector">
+          <label for="cluster-count">
+            Clusters: <span id="cluster-count-label">{CLUSTER_DEFAULT}</span>
+          </label>
+          <input
+            id="cluster-count"
+            type="range"
+            min="{CLUSTER_MIN}"
+            max="{CLUSTER_MAX}"
+            value="{CLUSTER_DEFAULT}"
+          />
+        </div>
+      </div>
+    </div>
     <aside id="sidebar">
-      <h1>Rio de Janeiro - Municipios</h1>
-      <div class="meta">Clique em um municipio para ver as especies (ordenadas por raridade).</div>
       <div class="stat" id="info">
-        <strong>Selecione um municipio</strong>
-        <div>Riqueza de especies: -</div>
+        <div class="info-title" id="info-title">Selecione um municipio</div>
+        <div class="info-subtitle" id="info-subtitle">Clique em um municipio para ver as especies (ordenadas por raridade).</div>
+        <div class="info-row">
+          <span class="info-label">Riqueza</span>
+          <span class="info-value" id="info-richness">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Cluster</span>
+          <span class="info-value" id="info-cluster">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Assinatura</span>
+          <span class="info-value" id="info-signature">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Mostrando</span>
+          <span class="info-value" id="info-count">0</span>
+        </div>
       </div>
       <div class="search">
         <label for="species-search">Buscar especies</label>
@@ -334,6 +506,12 @@ def main():
   <script>
     const GEOJSON = {json.dumps(geojson, ensure_ascii=False)};
     const MUNICIPIOS = {json.dumps(municipio_data, ensure_ascii=False)};
+    const CLUSTER_HISTORY = {json.dumps(cluster_history, ensure_ascii=False)};
+    const CLUSTER_COLORS = {json.dumps(CLUSTER_COLORS)};
+    const CLUSTER_MIN = {CLUSTER_MIN};
+    const CLUSTER_MAX = {CLUSTER_MAX};
+    const CLUSTER_DEFAULT = {CLUSTER_DEFAULT};
+    const CLUSTER_LEVELS = {json.dumps(CLUSTER_LEVELS)};
     const RARITY_VERY_CUTOFF = {RARITY_VERY_CUTOFF};
     const RARITY_CUTOFF = {RARITY_CUTOFF};
     const RARITY_MINOR_CUTOFF = {RARITY_MINOR_CUTOFF};
@@ -367,8 +545,145 @@ def main():
       return COLOR_BINS[COLOR_BINS.length - 1];
     }}
 
-    const values = Object.values(MUNICIPIOS).map(d => d.richness);
-    const thresholds = buildThresholds(values, COLOR_BINS.length);
+    let currentClusterCount = CLUSTER_DEFAULT;
+    let currentClusterLevel = 'species';
+    let activeClusterFilter = null;
+
+    function getClusterLabel(data) {{
+      if (!data || !data.clusters) return null;
+      const levelBuckets = data.clusters[currentClusterLevel] || {{}};
+      return levelBuckets[currentClusterCount];
+    }}
+
+    function getClusterColor(data) {{
+      const label = getClusterLabel(data);
+      if (label == null || !CLUSTER_COLORS.length) return null;
+      return CLUSTER_COLORS[label % CLUSTER_COLORS.length];
+    }}
+
+    function getMunicipioStrokeColor(data) {{
+      return getClusterColor(data) || '#4c4c4c';
+    }}
+
+    function getClusterSummary(count) {{
+      const level = CLUSTER_HISTORY[currentClusterLevel] || {{}};
+      return level[count] || {{}};
+    }}
+
+    const richnessValues = Object.values(MUNICIPIOS)
+      .map(d => d.richness)
+      .filter(value => typeof value === 'number');
+    const minRichness = Math.min(...richnessValues);
+    const maxRichness = Math.max(...richnessValues);
+
+    function getRichnessOpacity(value) {{
+      if (value == null || !Number.isFinite(value)) return 0.2;
+      if (maxRichness <= minRichness) return 0.75;
+      const ratio = (value - minRichness) / (maxRichness - minRichness);
+      const boosted = Math.sqrt(Math.max(0, ratio));
+      return 0.2 + boosted * 0.75;
+    }}
+
+    function getMunicipioFillColor(data) {{
+      return getClusterColor(data) || getColor(data ? data.richness : null, thresholds);
+    }}
+
+    function getMunicipioFillOpacity(data) {{
+      if (getClusterColor(data)) return getRichnessOpacity(data.richness);
+      return 0.75;
+    }}
+
+    function renderClusterLegend(count = currentClusterCount) {{
+      const list = document.getElementById('cluster-legend-items');
+      if (!list) return;
+      list.innerHTML = '';
+      const summary = getClusterSummary(count);
+      const entries = Object.entries(summary)
+        .map(([label, info]) => {{
+          return {{ label: Number(label), info }};
+        }})
+        .sort((a, b) => a.label - b.label);
+      if (!entries.length) {{
+        const empty = document.createElement('div');
+        empty.textContent = 'Dados de cluster nao disponiveis';
+        empty.style.fontSize = '11px';
+        list.appendChild(empty);
+        return;
+      }}
+      entries.forEach(({{ label, info }}) => {{
+        const item = document.createElement('div');
+        item.className = 'cluster-legend-item';
+        item.dataset.cluster = label;
+        if (activeClusterFilter === label) {{
+          item.classList.add('active');
+        }}
+        const color = CLUSTER_COLORS[label % CLUSTER_COLORS.length] || '#d6d3cc';
+        item.innerHTML = `
+          <span class="cluster-legend-color" style="background:${{color}};"></span>
+          <span class="cluster-legend-meta">
+            <strong>Cluster ${{label}}</strong>
+            <span>${{(info.signature || []).join(', ') || 'sem assinatura'}}</span>
+          </span>
+        `;
+        item.addEventListener('click', () => {{
+          if (activeClusterFilter === label) {{
+            activeClusterFilter = null;
+          }} else {{
+            activeClusterFilter = label;
+          }}
+          renderClusterLegend(currentClusterCount);
+          applyClusterStyles();
+        }});
+        list.appendChild(item);
+      }});
+    }}
+
+    function applyClusterStyles() {{
+      if (!geojson) return;
+      geojson.eachLayer(layer => {{
+        const name = layer.feature.properties.name || '';
+        const data = MUNICIPIOS[keyName(name)];
+        const clusterLabel = getClusterLabel(data);
+        const isFiltered = activeClusterFilter != null;
+        const isMatch = clusterLabel === activeClusterFilter;
+        if (activeLayer === layer) {{
+          layer.setStyle({{
+            color: '#111',
+            weight: 3,
+            fillOpacity: Math.min(0.95, getMunicipioFillOpacity(data) + 0.15),
+            fillColor: getMunicipioFillColor(data),
+          }});
+          return;
+        }}
+        layer.setStyle({{
+          color: getMunicipioStrokeColor(data),
+          weight: isFiltered && !isMatch ? 0.5 : 1,
+          fillOpacity: isFiltered && !isMatch ? 0.15 : getMunicipioFillOpacity(data),
+          fillColor: getMunicipioFillColor(data),
+        }});
+      }});
+    }}
+
+    function setClusterCount(value) {{
+      currentClusterCount = Math.min(Math.max(value, CLUSTER_MIN), CLUSTER_MAX);
+      const label = document.getElementById('cluster-count-label');
+      if (label) {{
+        label.textContent = `${{currentClusterCount}}`;
+      }}
+      activeClusterFilter = null;
+      renderClusterLegend(currentClusterCount);
+      applyClusterStyles();
+    }}
+
+    function setClusterLevel(level) {{
+      if (!CLUSTER_LEVELS.includes(level)) return;
+      currentClusterLevel = level;
+      activeClusterFilter = null;
+      renderClusterLegend(currentClusterCount);
+      applyClusterStyles();
+    }}
+
+    const thresholds = buildThresholds(richnessValues, COLOR_BINS.length);
 
     const map = L.map('map').setView([-22.4, -42.5], 7.4);
     L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
@@ -393,10 +708,18 @@ def main():
     }})();
 
     function renderSpeciesList(data, query) {{
-      const info = document.getElementById('info');
       const list = document.getElementById('species-list');
       if (!data) {{
-        info.innerHTML = '<strong>Sem dados</strong><div>Riqueza de especies: -</div>';
+        const titleEl = document.getElementById('info-title');
+        const richnessEl = document.getElementById('info-richness');
+        const clusterEl = document.getElementById('info-cluster');
+        const signatureEl = document.getElementById('info-signature');
+        const countEl = document.getElementById('info-count');
+        if (titleEl) titleEl.textContent = 'Sem dados';
+        if (richnessEl) richnessEl.textContent = '-';
+        if (clusterEl) clusterEl.textContent = '—';
+        if (signatureEl) signatureEl.textContent = '—';
+        if (countEl) countEl.textContent = '0';
         list.innerHTML = '';
         return;
       }}
@@ -407,7 +730,19 @@ def main():
         const scientific = (item.scientific || '').toLowerCase();
         return common.includes(normalized) || scientific.includes(normalized);
       }});
-      info.innerHTML = `<strong>${{data.name}}</strong><div>Codigo: ${{data.code}}</div><div>Riqueza de especies: ${{data.richness}}</div><div>Mostrando: ${{filtered.length}}</div>`;
+      const selectedCluster = getClusterLabel(data);
+      const summary = getClusterSummary(currentClusterCount)[selectedCluster] || {{ signature: [] }};
+      const clusterSignature = summary.signature.length ? summary.signature.join(', ') : 'sem assinatura';
+      const titleEl = document.getElementById('info-title');
+      const richnessEl = document.getElementById('info-richness');
+      const clusterEl = document.getElementById('info-cluster');
+      const signatureEl = document.getElementById('info-signature');
+      const countEl = document.getElementById('info-count');
+      if (titleEl) titleEl.textContent = data.name;
+      if (richnessEl) richnessEl.textContent = data.richness;
+      if (clusterEl) clusterEl.textContent = selectedCluster != null ? `Cluster ${{selectedCluster}}` : '—';
+      if (signatureEl) signatureEl.textContent = clusterSignature;
+      if (countEl) countEl.textContent = filtered.length;
       list.innerHTML = '';
       filtered.forEach(item => {{
         const div = document.createElement('div');
@@ -444,11 +779,11 @@ def main():
         const key = keyName(name);
         const data = MUNICIPIOS[key];
         const baseStyle = {{
-          color: '#4c4c4c',
-          weight: 1,
-          fillOpacity: 0.75,
-          fillColor: getColor(data ? data.richness : null, thresholds)
-        }};
+        color: getMunicipioStrokeColor(data),
+        weight: 1,
+        fillOpacity: getMunicipioFillOpacity(data),
+        fillColor: getMunicipioFillColor(data)
+      }};
         if (keys.has(key)) {{
           layer.setStyle({{
             ...baseStyle,
@@ -524,12 +859,31 @@ def main():
         return {{
           color: '#4c4c4c',
           weight: 1,
-          fillOpacity: 0.75,
-          fillColor: getColor(data ? data.richness : null, thresholds)
+          fillOpacity: getMunicipioFillOpacity(data),
+          fillColor: getMunicipioFillColor(data)
         }};
       }},
       onEachFeature
     }}).addTo(map);
+
+    const clusterInput = document.getElementById('cluster-count');
+    const clusterLevel = document.getElementById('cluster-level');
+    if (clusterInput) {{
+      if (!Object.keys(CLUSTER_HISTORY).length) {{
+        clusterInput.setAttribute('disabled', 'disabled');
+      }}
+      clusterInput.addEventListener('input', (event) => {{
+        if (!event.target) return;
+        setClusterCount(Number(event.target.value));
+      }});
+    }}
+    if (clusterLevel) {{
+      clusterLevel.addEventListener('change', (event) => {{
+        if (!event.target) return;
+        setClusterLevel(event.target.value);
+      }});
+    }}
+    setClusterCount(CLUSTER_DEFAULT);
 
     document.getElementById('species-search').addEventListener('input', (event) => {{
       if (!activeData) return;

@@ -2,6 +2,10 @@
 
 Este projeto baixa dados do eBird para o estado do Rio de Janeiro, gera um relatorio em Excel com tabelas e graficos, e cria um mapa HTML interativo por municipio.
 
+## Visualize o mapa direto no GitHub
+
+O `map_rj.html` fica logo no topo do repositório e pode ser aberto com a preview HTML do GitHub para interagir pelo navegador; também dá pra usar https://htmlpreview.github.io/?https://github.com/FilipePrates/ebird_data_por_municipios/master/map_rj.html. Manter esse HTML na raiz garante que qualquer visitante clique e explore os filtros do mapa sem precisar rodar os scripts localmente.
+
 ## O que voce precisa
 
 - Ubuntu
@@ -63,6 +67,8 @@ Abra o arquivo no navegador:
 ```
 map_rj.html
 ```
+
+> **Preview do mapa**: ao clicar no `map_rj.html` na arvore do repositório o GitHub abre o `map.html` (a mesma versão interativa) e permite explora-lo no proprio browser; voce tambem pode usar `https://htmlpreview.github.io/?https://github.com/FilipePrates/ebird_data_por_municipios/master/map_rj.html` para carregar o mapa em outra aba.
 
 ## Onde ficam os resultados
 
